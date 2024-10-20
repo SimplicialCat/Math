@@ -1,0 +1,570 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\usepackage{tikz}
+\usetikzlibrary{cd}
+
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[section]
+\newtheorem{prop}[definition]{命题}
+\newtheorem{example}[definition]{例}
+\newtheorem{remark}[definition]{注}
+
+
+\newcommand{\CartSp}{\mathsf{CartSp}}
+\newcommand{\Set}{\mathsf{Set}}
+\newcommand{\Mfd}{\mathsf{Mfd}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\Psh}{\mathrm{Psh}}
+\newcommand{\Grpd}{\mathsf{Grpd}}
+\newcommand{\LieGrpd}{\mathsf{LieGrpd}}
+\newcommand{\GroupoidQuotient}{/\!\!/}
+
+\usepackage{hyperref}
+
+\begin{document}
+	
+	\title{微分几何中的范畴学}
+	\author{\emph{王进一}}
+	\date{2024 年秋}
+	\maketitle
+	
+	% 
+	
+	\section*{大纲}
+	本文是 2024 年秋给求真书院三字班同学准备的演讲, 主旨是用范畴论的方法产生广泛的 ``空间'' 概念.
+	第一节介绍 $\mathsf{CartSp}$ 上的层作为一种广义的流形 ($\mathsf{CartSp}$ 是流形 $\mathbb R^n$ 构成的范畴), 引出意象的概念.
+	第二节介绍 Lie 群胚作为 $\mathsf{CartSp}$ 上的 $2$-层, 以此引出高阶意象.
+	第三节介绍综合微分几何的思想, 基本概念与模型, 以及凝集意象 (cohesive topos) 的概念.
+	
+	本文使用的前置知识: 范畴论 (函子, 自然变换, 群胚), 微分几何 (微分流形), 代数拓扑 (连通分支, 同伦类).
+	
+	本文中的流形是指微分流形.
+	
+	\section{一种广义的流形}
+	
+	\subsection{预层}
+	
+	\begin{definition}
+		记 $\Mfd$ 为流形的范畴.
+		范畴 $\CartSp$ 是由流形 $\mathbb{R}^n$ ($n=0,1,2,\cdots$) 以及光滑映射构成的 $\Mfd$ 的全子范畴.
+	\end{definition}
+	
+	直观地说, 子范畴 $\CartSp$ 在 $\Mfd$ 中占有支配性的地位. 因为一个 $n$ 维流形由 $\mathbb{R}^n$ 到它的所有光滑映射 (以及这些映射之间的关系) 完全决定. 这个事实导致流形范畴可以全忠实地嵌入下面定义的预层范畴.
+	
+	\begin{definition}
+		$\CartSp$ 上的\emph{预层} (以下简称预层) 是函子 $\CartSp^\op\to\Set$, 预层的态射是函子之间的自然变换.
+		记预层的范畴为 $\Psh(\CartSp)$.
+	\end{definition}
+	
+	对于预层 $X\colon \CartSp^\op\to\Set$, 我们直观上将 $X$ 视为某种空间, 其在 $\mathbb{R}^n$ 上的取值 $X(\mathbb{R}^n)$ 的直观是 $\mathbb{R}^n$ 到 $X$ 的所有 ``光滑映射'' 的集合. 这里, ``光滑映射'' 没有实际的含义, 而我们正在赋予它含义. 这个直观的道理在于, 光滑映射 $f\colon \mathbb{R}^m\to\mathbb{R}^n$ 以及 ``光滑映射'' $g\colon \mathbb{R}^n\to X$ (即 $g\in X(\mathbb{R}^n)$) 可以 ``复合'' 得到 ``光滑映射'' $g\circ f\colon \mathbb{R}^m\to X$ (即 $f^*(g)\in X(\mathbb{R}^m)$). 这是说: 就 $\mathbb{R}^n$ 打进去的映射而言, 一个预层和一个普通流形表现得并无区别.
+	
+	下面的定义说明, 普通流形可视为预层.
+	
+	\begin{definition}
+		设 $M$ 为流形. 定义其对应的预层为 $$\underline{M}=\operatorname{Hom}_{\Mfd}(-,M)\colon \CartSp^\op\to\Set.$$
+	\end{definition}
+	
+	函子 $\underline{M}$ 包含了所有映射 $\mathbb{R}^m\to M$ 以及这些映射之间的关系的信息. 由定义, $\underline{M}(\mathbb{R}^0)$ 是 $M$ 中的点的集合, $\underline{M}(\mathbb{R}^1)$ 是 $M$ 中的线的集合, 以此类推.
+	
+	下面命题表明存在全忠实嵌入 $\Mfd\to\Psh(\CartSp)$.
+	
+	\begin{prop}
+		对于普通流形 $M,N$, 预层的态射 $\underline{M}\to \underline{N}$
+		一一对应于流形的光滑映射 $M\to N$.
+	\end{prop}
+	\begin{proof}
+		流形的光滑映射 $M\to N$ 通过复合 $\mathbb{R}^m\to M\to N$ 给出了预层的态射 $\underline{M}\to \underline{N}$.
+		
+		反之, 设有预层的态射 $f\colon \underline{M}\to \underline{N}$.
+		我们断言 $f_{\mathbb{R}^0}\colon \underline{M}(\mathbb{R}^0)\to \underline{N}(\mathbb{R}^0)$ 是光滑映射.
+		这只需证明对 $M$ 的任意局部坐标卡 $\varphi\colon \mathbb{R}^m\to M$ (即 $\varphi\in \underline{M}(\mathbb{R}^m)$), 都有 $f_{\mathbb{R}^0}\circ\varphi\colon \mathbb{R}^m\to N$ 是光滑映射.
+		
+		对任意 $p\colon \mathbb{R}^0\to\mathbb{R}^m$ 考虑下图,
+		% https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHVuZGVybGluZXtNfShcXG1hdGhiYntSfV4wKSJdLFsxLDAsIlxcdW5kZXJsaW5le059KFxcbWF0aGJie1J9XjApIl0sWzAsMSwiXFx1bmRlcmxpbmV7TX0oXFxtYXRoYmJ7Un1ebSkiXSxbMSwxLCJcXHVuZGVybGluZXtOfShcXG1hdGhiYntSfV5tKSJdLFswLDEsImZfe1xcbWF0aGJie1J9XjB9Il0sWzIsMCwicF4qIl0sWzIsMywiZl97XFxtYXRoYmJ7Un1ebX0iLDJdLFszLDEsInBeKiIsMl1d
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{\underline{M}(\mathbb{R}^0)} \& {\underline{N}(\mathbb{R}^0)} \\
+			{\underline{M}(\mathbb{R}^m)} \& {\underline{N}(\mathbb{R}^m)}
+			\arrow["{f_{\mathbb{R}^0}}", from=1-1, to=1-2]
+			\arrow["{p^*}", from=2-1, to=1-1]
+			\arrow["{f_{\mathbb{R}^m}}"', from=2-1, to=2-2]
+			\arrow["{p^*}"', from=2-2, to=1-2]
+		\end{tikzcd}\]
+		知 $f_{\mathbb{R}^0}(p^*\varphi) = p^*f_{\mathbb{R}^m}(\varphi)$, 即 $(f_{\mathbb{R}^0}\circ\varphi) (p)=f_{\mathbb{R}^m}(\varphi)(p)$. 这说明 $f_{\mathbb{R}^0}\circ\varphi = f_{\mathbb{R}^m}(\varphi)\in \underline{N}(\mathbb{R}^m)$ 为光滑映射.
+	\end{proof}
+	
+	\begin{remark}
+		用范畴论的术语, 子范畴 $\CartSp\hookrightarrow\Mfd$ 是\emph{稠密}的, 因为任何 $n$ 维流形都可表示为若干个 $\mathbb{R}^n$ 的余极限. 这个事实是存在全忠实嵌入 $\Mfd\to\Psh(\CartSp)$ 的本质原因.
+	\end{remark}
+	
+	\begin{remark}
+		我们介绍的预层的概念符合 Grothendieck 学派的代数几何所惯用的\emph{函子语言} (\emph{langage fonctoriel}) 的思想\footnote{EGA1 注 2.3.6}. 在代数几何中, 一个概形 $X$ 可视为仿射概形范畴 $\mathsf {Aff}$ 上的预层, 即函子 $\mathsf {Ring}\to\Set$ (因为范畴 $\mathsf {Ring}$ 与 $\mathsf {Aff}$ 互为对偶); 这个函子称为 $X$ 的\emph{点函子} (\emph{foncteur de points}), 对于环 $R$, $X(R)$ 的元素 (即概形的态射 $\operatorname{Spec}(R)\to X$) 称为 $X$ 的 \emph{$R$-点}.
+	\end{remark}
+	
+	预层的优势在于范畴 $\Psh(\CartSp)$ 具有 $\Mfd$ 没有的许多美好性质.
+	
+	\begin{example}
+		$\Mfd$ 缺少余极限. 例如 $\mathbb{R}^1\leftarrow \mathbb{R}^0\to\mathbb{R}^1$ 在拓扑空间范畴中的推出是一个十字形, 它不是流形.
+	\end{example}
+	
+	\begin{example}
+		$\Mfd$ 中缺少 ``映射空间''; 两个流形之间的映射空间不是流形 (映射空间是所谓 ``无穷维流形'').
+		在范畴论中, 对于两个对象 $X,Y$, 若存在对象 $X^Y$ 满足如下条件, 则称之为\emph{指数对象}:
+		$$
+		\operatorname{Hom}(Z,X^Y)\simeq\operatorname{Hom}(Z\times Y,X).
+		$$
+		例如集合范畴中 $X^Y$ 就是 $Y$ 到 $X$ 的映射的集合. 但流形范畴中不存在这种对象.
+	\end{example}
+	
+	\begin{example}
+		$\Psh(\CartSp)$ 中存在所有的极限和余极限. 这是函子范畴的性质: 函子范畴 $\mathsf{Fun}(\mathcal C,\mathcal D)$ 中的 (余) 极限相当于 ``逐点'' 取 $\mathcal D$ 中的 (余) 极限. 而集合范畴 $\Set$ 中存在所有的 (余) 极限, 从而对任意范畴 $\mathcal C$, $\mathsf{Fun}(\mathcal C,\Set)$ 也存在所有的 (余) 极限.
+	\end{example}
+	
+	\begin{example}
+		$\Psh(\CartSp)$ 中存在指数对象. 对 $X,Y\in\Psh(\CartSp)$, 定义
+		$$
+		X^Y\colon \CartSp^{\op}\to\Set,\quad
+		X^Y(\mathbb{R}^n) := \operatorname{Hom}_{\Psh(\CartSp)}(Y\times\underline{\mathbb{R}^n},X).
+		$$
+		例如任何两个流形之间的映射空间都可实现为 $\Psh(\CartSp)$ 的对象, 从而这种空间和普通流形可得到一视同仁的处理.
+	\end{example}
+	
+	\begin{definition}
+		\emph{意象}是具有有限极限, 有限余极限, 子对象分类子和指数对象的范畴.
+	\end{definition}
+	
+	限于篇幅, 本文无法详细介绍这个定义中每个概念的意义, 只能举例说明. 
+	每个预层范畴以及每个层范畴都是一个意象, 具有上述定义中提到的范畴论结构.
+	
+	\begin{example}
+		集合范畴是一个意象.
+	\end{example}
+	
+	\subsection{层}
+	
+	\begin{definition}
+		$\mathbb{R}^n$ 的一个\emph{好覆盖} $\{f_i\colon U_i\to \mathbb{R}^n\}$ 是一系列开子集 $U_i$, 满足每个 $U_i$ 以及其中任何有限个的交集 (只要非空) 都微分同胚于 $\mathbb{R}^n$.
+	\end{definition}
+	
+	\begin{definition}
+		$\CartSp$ 上的\emph{层}是满足如下条件的预层 $X\colon \CartSp^\op\to\Set$:
+		对任意好覆盖 $\{f_i\colon U_i\to \mathbb{R}^n\}$,
+		只要给定了一族相容的元素 $s_i\in X(U_i)$ (因为 $U_i$ 微分同胚于 $\mathbb{R}^n$, 这个记号是合理的), 就存在唯一的 $s\in X(\mathbb{R}^n)$ 使得 $X(f_i)(s)=s_i$.
+		其中一族元素 $s_i\in X(U_i)$ 相容是指任意两个元素 $s_i,s_j$ 在 $X(U_i\cap U_j)$ 中相容.
+		
+		层条件可表述为更抽象的形式: 对任意好覆盖 $\{f_i\colon U_i\to\mathbb{R}^n\}$,
+		$$
+		X(\mathbb{R}^n)\to\lim\Big({\prod_{i}X(U_i)\rightrightarrows \prod_{i,j}X(U_i\cap U_j)}\Big)
+		$$
+		为同构.
+	\end{definition}
+	
+	\begin{example}
+		对任意流形 $M$, 预层 $\underline{M}$ 是层. 这就是说, 光滑映射 $\mathbb{R}^n\to M$ 可由任何一个开覆盖 $\{U_i\to \mathbb{R}^n\}$ 以及一族相容的光滑映射 $U_i\to M$ 给出.
+	\end{example}
+	
+	\begin{example}
+		现在介绍一个有趣的层, 它叫做\emph{微分 $k$-形式的模空间} $\Omega^k$. 它的定义是
+		$$
+		\Omega^k(\mathbb{R}^n):=\Omega^k(\mathbb{R}^n).
+		$$
+		这并不是在开玩笑! 左边是我们在定义这个函子取值于 $\mathbb{R}^n$, 而右边是微分几何中定义的 $\mathbb{R}^n$ 上 $k$ 形式的集合. 它是层意味着微分形式可以在局部上定义, 然后拼起来. 称 $\Omega^k$ 为 ``微分 $k$-形式的模空间'' 的原因是, 流形 $M$ 上的微分 $k$-形式等同于预层的态射 $\underline{M}\to\Omega^k$, 等同于对每个映射 $\mathbb{R}^n\to M$ (想象为坐标卡) 给出 $\mathbb{R}^n$ 上的一个相容的 $k$-形式.
+	\end{example}
+	
+	\section{Lie 群胚与叠}
+	
+	\subsection{寓言: 模空间与集合的缺陷}
+	
+	在介绍 Lie 群胚与叠之前, 为了解释其动机, 我想先讲一个故事.
+%	首先我提出如下的直观.
+%	\begin{center}
+%		在一些离散的点之间连接一些边, 会使得点的数量减少.
+%	\end{center}
+%	要严格化这种直观, 有几种方法:
+%	\begin{itemize}
+%		\item 拓扑空间的\emph{连通分支}. 例如, 两个点之间连一条线, 得到的空间只有一个连通分支. 三个点之间连两条线, 得到的空间也只有一个连通分支. 换言之, 加一条边会减少 $\pi_0$.
+%		\item 范畴中对象的\emph{同构类}. 例如, 两个对象之间有一个同构, 得到的群胚等价于只有一个对象.
+%	\end{itemize}
+%	
+%	但我们继续添加边, 会发现不对劲:
+%	三个点之间连三条线构成一个圈, 得到的空间 $\pi_0$ 还是一个点, 而不是零个点.
+%	
+%	在两个点 $x$ 与 $y$ 之间连一条线 $a$, 相当于加上一个等式 $a\colon x=y$.
+%	
+%	假若在两个点之间连两条线, 即加上两个等式 $a\colon x=y$, $b\colon x=y$, 得到的空间是 $S^1$, Euler 数是 $2-2=0$. 这告诉我们两个等式和一个等式是不一样的.
+%	
+%	有时我们会觉得一个集合必须有整数个点, 这个事实使得集合作为某些对象的模空间太过粗糙. 我们希望一个集合能有半个点, 或者 $1/n$ 个点. 因为一个点可以有多种方式等于它自己, 即有多个不平凡的自同构. (在有些学科中我们把这些自同构叫做对称.) 于是我们有理由将集合升级为\emph{群胚}, 即所有态射均为同构的 $1$-范畴.
+	
+	计数一些东西的时候, 我们会发现两个东西之间有一个同构 $x\simeq y$, 导致两者应该视为同一个东西. 为了修正这个问题, 我们在结果中减掉 1.
+	如果发现了两个同构 $x\simeq y\simeq z$, 我们就要在结果中减掉 $2$, 以此类推. 但这样的做法会出现新的问题. 如果我们发现了三个同构, $x\simeq y\simeq z\simeq x$, 我们不能在结果中减去 $3$, 但是这种情形好像又不能简单地等同于 $x\simeq y\simeq z$. 因为这三个同构的复合会给出一个非平凡的同构 $x\simeq x$, 也即 $x$ 的非平凡对称性. 我们发现一个整数已经不能表示这个计数的结果了.
+	
+	用数学家的行话来讲, 计数就是求某类对象的\emph{模空间} (moduli space). 如果要用整数来表示计数的结果, 把同构的对象严格地看作同一个东西, 我们实际上求得的是模空间的连通分支的集合 $\pi_0$, 而这在一些场合是不够的.
+	
+	例如, 要计数 ``$\mathbb{R}$ 上的 $1$ 维线性空间'' 这类对象, 我们知道其中任何两个对象都是同构的. 但是假若我们认为 $\mathbb{R}$ 上的 $1$ 维线性空间真的 ``只有一个'', 就无法解释 Mobius 带的存在. Mobius 带是 $S^1$ 上的丛, 虽然它在 $S^1$ 的每个点上的纤维都是 $\mathbb{R}$, 但这个丛作为整体不是平凡的.
+	实际上, ``$\mathbb{R}$ 上的 $1$ 维线性空间的模空间'' 应视为一个群胚, 其中唯一的对象带有 $\mathbb{Z}/2\mathbb{Z}$ 的对称性, 这体现了 $\mathbb{R}^1$ 有一个非平凡的自同构 $x\mapsto -x$.
+	这个模空间虽然是连通的 ($\pi_0$ 是一个点), 但包含了非平凡的同伦信息.
+	
+	如果说群描述的是一个东西的对称性, 那么群胚描述的是一些东西之间的对称性.
+	
+	希望到这里我已经说服读者把模空间由集合升级为群胚的意义.
+	
+	模空间的另一个要点是, 许多模空间都是用一个 ``测试空间的范畴'' $\mathcal C$ 上的层来表示的, 例如上一节介绍的 $\CartSp$ 上的层. 我举一个简单的例子. 考虑 ``色彩的模空间''.
+	假设我们暂时不知道色彩的模空间是什么. 但很明显, 一张 $n$ 维的图片应当是 $\mathbb{R}^n$ 到色彩的模空间的一个映射. 那么色彩的模空间就可以用一个预层 $X\colon \CartSp^{\op}\to\Set$ 来表示, 其中
+	$X(\mathbb{R}^n)$ 是所有 $n$ 维图片的集合.
+	一般地, 假若将层 $X\colon \mathcal C^{\op}\to\Set$ 视为一类对象的模空间, 那么对于 $\mathcal C$ 的对象 $c$, $X(c)$ 的元素可视为 $c$ 上这类对象的丛. %进一步, 当这类对象具有非平凡的自同构时, 模空间应当升级为取值于群胚的层.
+	
+	结合以上讨论, 不难想象应当有一种 ``取值于群胚的层'' 的概念作为更好的模空间的概念. 于是我们就可以进入正题了.
+	
+	%理解了我讲的故事, 读者应当就能自然地接受.
+	
+	\subsection{Lie 群胚}
+	
+	\begin{definition}
+		\emph{Lie 群胚}是微分流形范畴中的群胚; 换言之, 它是一个群胚, 且对象集与态射集都带有流形结构. 具体地, 一个 Lie 群胚 $\mathcal G$ 包含如下信息:
+		\begin{itemize}
+			\item 一个流形 $\mathcal G_0$, 称作 ``对象集'';
+			\item 一个流形 $\mathcal G_1$, 称作 ``态射集'';
+			\item 两个映射 $s,t\colon \mathcal G_1\rightrightarrows \mathcal G_0$, 分别称为态射的起点和终点;
+			\item 一个映射 $c\colon \mathcal G_1\times_{\mathcal G_0} \mathcal G_1\to \mathcal G_1$, ``态射的复合'' (其中 $\mathcal G_1\times_{\mathcal G_0} \mathcal G_0 = \{(g,g')\in \mathcal G_1\times \mathcal G_1\mid s(g)=t(g')\}$);
+			\item 一个映射 $e\colon \mathcal G_0\to \mathcal G_1$, ``恒等态射'';
+			\item 一个映射 $i\colon \mathcal G_1\to \mathcal G_1$, ``态射的逆''.
+		\end{itemize}
+		这些数据应满足与通常群胚类似的条件, 此处略去.
+		
+		为了记号的简便, 我们用 $s,t\colon \mathcal G_1\rightrightarrows \mathcal G_0$ 表示一个 Lie 群胚, 其余的信息略去 (因为通常其余的信息是明显的).
+		
+		Lie 群胚的态射 $\mathcal G\to\mathcal H$ 是两个光滑映射 $\mathcal G_1\to\mathcal H_1$, $\mathcal G_0\to\mathcal H_0$, 与所有结构映射相容.
+	\end{definition}
+	
+	% https://ncatlab.org/nlab/show/differentiable+stack
+	
+	\begin{example}
+		设 $M$ 为流形. 则 $\operatorname{id},\operatorname{id}\colon M\rightrightarrows M$ 为 Lie 群胚. 这个 Lie 群胚中的态射仅有每个对象的恒等态射. 我们将这个 Lie 群胚仍记为 $M$, 意思是它和流形 $M$ 在我们心目中是同一个东西. 两个流形 $M,N$ 之间的光滑映射一一对应于其作为 Lie 群胚的态射, 即有全忠实嵌入 $\Mfd\to\LieGrpd$.
+	\end{example}
+	
+	\begin{example}
+		设 $G$ 为 Lie 群. 则 $G\rightrightarrows *$ 为 Lie 群胚. 这是只有一个对象的群胚. 我们将这个 Lie 群胚记为 $\mathbf BG$.
+	\end{example}
+	
+	\begin{example}
+		\emph{轨形} (orbifold) 是 ``局部同构于欧氏空间在有限群作用下的商'' 的空间. 轨形等同于满足如下条件的 Lie 群胚 $\mathcal G$.
+		\begin{itemize}
+			\item $(s,t)\colon\mathcal G_1\to\mathcal G_0\times\mathcal G_0$ 是紧合映射 (proper map);
+			\item 每个对象 $x\in\mathcal G_0$ 的自同构群 $G_x$ 是离散群.
+		\end{itemize}
+		轨形的例子包括
+		\begin{itemize}
+			\item ``橄榄球'', 即 $\mathbb{Z}/n$ 旋转作用于 $S^2$;
+			\item ``半平面'', 即 $\mathbb{Z}/2$ 反射作用于平面;
+			\item 任何带边流形都是 $\mathbb{Z}/2$ 作用于其 ``加倍''.
+		\end{itemize}
+	\end{example}
+	
+	\subsection{群胚与商}
+	
+	群胚相比集合的优越性还可理解为, 它更好地表达了 ``商'' 的概念.
+	
+	\begin{definition}
+		设 $S$ 为集合, $G$ 为群, $G$ 右作用于 $S$. 考虑一个群胚, 其对象集为 $S$, 态射为
+		$$
+		\operatorname{Hom}(s,t)=\{g\in G\mid s\cdot g=t\}.
+		$$
+		称这个群胚为\emph{作用群胚}, 记为 $S \GroupoidQuotient G$.
+	\end{definition}
+	
+	群胚 $S\GroupoidQuotient G$ 的 $\pi_0$ 是朴素的商集 $S/G$. 我们看到, $S\GroupoidQuotient G$ 比 $S/G$ 保留了更多的信息.
+	
+	在流形范畴中, 以 Lie 群胚表示的 ``商'' 的概念显得更加重要, 因为一个流形 $M$ 在 Lie 群 $G$ 的作用之下, 朴素的商 $M/G$ 甚至不一定是流形, 但总存在相应的 Lie 群胚 $M\GroupoidQuotient G$.
+	
+	\begin{definition}
+		设 $M$ 为流形, $G$ 为 Lie 群, $G$ 通过映射 $\rho\colon M\times G\to M$ 右作用于 $M$. 定义其\emph{作用 Lie 群胚}为
+		$$
+		M\GroupoidQuotient G := (\pi_1,\rho)\colon M\times G\rightrightarrows M.
+		$$
+	\end{definition}
+	
+	对任意流形 $N$, Lie 群胚同态 $M\GroupoidQuotient G \to N$ (其中 $N$ 视为 Lie 群胚) 一一对应于 $G$-不变的映射 $M\to N$. 这说明 $M\GroupoidQuotient G$ 表现得确实像一个商.
+	
+	\begin{example}
+		设 $G$ 为 Lie 群, 则
+		$$
+		\mathbf BG\simeq *\GroupoidQuotient G.
+		$$
+		%与代数拓扑中的相关结论比较会发现一个很有意思的现象. 若存在带有自由 $G$-右作用的可缩空间 $EG$, 则分类空间 $BG$ 可实现为空间 $EG/G$. 这里 $EG$ 扮演的角色相当于 $*\GroupoidQuotient G$ 中的那个点 $*$.
+	\end{example}
+	
+	\subsection{主丛}
+	
+	$\mathbf BG$ 和 $G$-主丛的分类空间有关.
+	
+	\begin{definition}
+		设 $M$ 为流形, $G$ 为 Lie 群. 定义 $M$ 上的一个 \emph{$G$-主丛}为纤维丛 $p\colon P\to M$, 带有右作用 $\rho\colon P\times G\to P$,
+		使得存在开覆盖 $M=\bigcup U_i$, 其在每个 $U_i$ 上的限制 $P|_{U_i}$ 同构于平凡丛 $U_i\times G$, 且该同构保持 $G$-右作用.
+	\end{definition}
+	
+	\begin{definition}
+		对于流形 $M$ 的开覆盖 $\{U_i\}$, 定义 Lie 群胚 $C(\{U_i\})$ 为
+		$$
+		\coprod_{i,j}(U_i\cap U_j) \rightrightarrows \coprod_i U_i.
+		$$
+		(这其实是 $\infty$-群胚 ``\v{C}ech 脉'' 的青春版.)
+	\end{definition}
+	
+	Lie 群胚 $C(\{U_i\})$ 表现了 $M$ 是如何由开集粘合得到.
+	
+	\begin{prop}
+		流形 $M$ 上的 $G$-主丛可由 $M$ 的一个覆盖 $\{U_i\}$ 以及 Lie 群胚态射 $C(\{U_i\}) \to \mathbf BG$ 给出.
+	\end{prop}
+	\begin{proof}
+		对于 $M$ 的一个覆盖 $\{U_i\}$, 给一个 Lie 群胚态射 $C(\{U_i\}) \to \mathbf BG$ 相当于对每两个指标 $i,j$, 给一个光滑映射
+		$\varphi_{ij}\colon U_i\cap U_j \to G$, 并且
+		$$
+		\varphi_{jk}\circ\varphi_{ij} = \varphi_{ik}\colon U_i\cap U_j\cap U_k\to G.
+		$$
+		这正是 $G$-主丛所需的信息: 我们得到相应的 $G$-主丛
+		$$
+		P= \Big(\coprod_i U_i\times G\Big)\Big/(i,x,g)\sim (j,x,\varphi_{ij}(x)g).
+		$$
+		
+		上述构造还可写成更抽象的形式. 定义 Lie 群胚
+		$$
+		\mathbf EG = G \GroupoidQuotient G = (\pi_1,m\colon G\times G \rightrightarrows G)
+		$$
+		这个群胚每两个对象之间有唯一的同构, 因此它等价于一个点.
+		注意到有 Lie 群胚态射 $\mathbf EG\to\mathbf BG$ ``忘掉 $G\times G$ 的第一分量'', 也可以理解为映射 $G\to *$ 诱导的商的映射 $G\GroupoidQuotient G \to * \GroupoidQuotient G$.
+		这个态射表现了\emph{万有 $G$-主丛}.
+		
+		取拉回
+		% https://q.uiver.app/#q=WzAsNCxbMSwwLCJcXG1hdGhiZiBFRyJdLFsxLDEsIlxcbWF0aGJmIEJHIl0sWzAsMSwiQyhcXHtVX2lcXH0pIl0sWzAsMCwiUCJdLFszLDJdLFsyLDFdLFszLDBdLFswLDFdXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			P \& {\mathbf EG} \\
+			{C(\{U_i\})} \& {\mathbf BG,}
+			\arrow[from=1-1, to=1-2]
+			\arrow[from=1-1, to=2-1]
+			\arrow[from=1-2, to=2-2]
+			\arrow[from=2-1, to=2-2]
+		\end{tikzcd}\]
+		即
+		$$
+		P=\Big(\coprod_{i,j} (U_i\cap U_j)\times G \rightrightarrows \coprod_i U_i\times G\Big).
+		$$
+		它表现了主丛 $P$ 被局部平凡丛粘起来的过程.
+	\end{proof}
+	
+	
+	
+%	\subsection{轨形}
+%	
+%	\begin{definition}
+%		\emph{轨形} (orbifold) 是
+%	\end{definition}
+	
+	\subsection{``技术性细节'': 群胚的 Morita 等价}
+	
+	在主丛的例子中, 我们将 $M$ 上的主丛表示为 Lie 群胚的态射 $C(\{U_i\})\to \mathbf BG$. 然而我们真正希望的是 $M$ 上的主丛等同于 Lie 群胚的态射 $M\to\mathbf BG$. 直观上, $C(\{U_i\})$ 与 $M$ 是等价的 (它们作为\emph{群胚}确实是等价的), 但我们写不出 $M$ 到 $C(\{U_i\})$ 的 \emph{Lie 群胚态射}, 因为它需要一个\emph{光滑}映射 $M\to \coprod_i U_i$, 构成满射 $\coprod_i U_i\to M$ 的截面, 而这样的截面不存在. 这个现象可以表述为流形范畴中\emph{选择公理不成立}.
+	
+	这就是说, Lie 群胚的概念与我们心目中的那种对象还差了一点点 (而普通群胚没有这个问题是拜选择公理所赐). 群胚的 Morita 等价的概念正是为了填补这段空缺.
+	
+	\begin{definition}
+		Lie 群胚的\emph{范畴等价} $\mathcal G\to\mathcal H$ 是一个 Lie 群胚态射, 且
+		\begin{itemize}
+			\item \emph{全忠实}, 即
+			$$
+			\mathcal H_1\times_{\mathcal H_0}\mathcal G_0 \to \mathcal H_0
+			$$
+			为满浸没 (翻译成人话: $\mathcal H$ 的每个对象都同构于 $\mathcal G$ 的某个对象的像);
+			\item \emph{本质满}, 即
+			% https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXG1hdGhjYWwgR18xIl0sWzAsMSwiXFxtYXRoY2FsIEdfMFxcdGltZXMgXFxtYXRoY2FsIEdfMCJdLFsxLDEsIlxcbWF0aGNhbCBIXzBcXHRpbWVzIFxcbWF0aGNhbCBIXzAiXSxbMSwwLCJcXG1hdGhjYWwgSF8xIl0sWzEsMl0sWzAsM10sWzMsMl0sWzAsMV1d
+			\[\begin{tikzcd}[ampersand replacement=\&]
+				{\mathcal G_1} \& {\mathcal H_1} \\
+				{\mathcal G_0\times \mathcal G_0} \& {\mathcal H_0\times \mathcal H_0}
+				\arrow[from=1-1, to=1-2]
+				\arrow[from=1-1, to=2-1]
+				\arrow[from=1-2, to=2-2]
+				\arrow[from=2-1, to=2-2]
+			\end{tikzcd}\]
+			为拉回 (人话: 这个函子给出态射集的双射).
+		\end{itemize}
+	\end{definition}
+	\begin{definition}
+		称 Lie 群胚 $\mathcal G,\mathcal G'$ \emph{Morita 等价}是指存在范畴等价
+		$$\mathcal H\to\mathcal G,\quad \mathcal H\to\mathcal G'.$$
+	\end{definition}
+	Morita 等价是一个等价关系.
+	
+	% Lie groupoids up to Morita equivalence are equivalent to differentiable stacks.
+	
+	% This relation between Lie groupoids and their stacks of torsors is analogous to the relation between algebras and their categories of modules, which is probably the reason for the choice of terminology.
+	
+	\begin{example}
+		对于流形 $M$ 的覆盖 $\{U_i\}$, Lie 群胚态射 $C(\{U_i\})\to M$ 是范畴等价. 因此 $C(\{U_i\})$ 与 $M$ 是 Morita 等价的.
+	\end{example}
+	
+	\subsection{叠}
+	
+	如同微分流形可推广为 $\CartSp$ 上的层, Lie 群胚也有类似的推广, 即 $\CartSp$ 上的\emph{叠}, 又称 \emph{$2$-层}\footnote{$2$-层这个名字只是表达它比 ``层'' 高了一级, 但会引起一些误会, 因为它是取值于 $1$-群胚的层. 或许普通的层 (取值于集合 = $0$-群胚的层) 应该改称为 $0$-叠, 而取值为 $1$-群胚的层应称为 $1$-叠.}.
+	
+%	\begin{prop}
+%		
+%	\end{prop}
+	
+	\begin{definition}
+		$\CartSp$ 上的\emph{预叠} (prestack) 是指函子 $\CartSp^{\op}\to\Grpd$.\footnote{此处两边的范畴应视为 $2$-范畴. 但是出于某些神秘的原因也可以将 $\Grpd$ 视为 $1$-范畴, 所以不熟悉高阶范畴的读者可以安全地忽略这条注以及下面的注.}
+	\end{definition}
+	
+	%https://mathoverflow.net/questions/93948/link-between-internal-groupoids-and-stacks-on-a-topos
+	
+	%https://mathoverflow.net/questions/40452/who-first-came-up-with-the-idea-of-essential-morita-equivalence-of-internal-grou?rq=1
+	
+	%https://mathoverflow.net/q/111801
+	% What is the correct notion of Morita Equivalence between topological groupoids
+	
+	\begin{remark}
+		预叠有两种等价的看法, 一种是如上定义的 ``$\Grpd$-取值的预层'', 另一种则是 ``$\Psh(\CartSp)$ 中的群胚\footnotemark{}''.
+		设 $\mathcal X=(\mathcal X_1\rightrightarrows \mathcal X_0)$ 是 $\Psh(\CartSp)$ 中的群胚, 其中 $\mathcal X_1,\mathcal X_0$ 是 $\Psh(\CartSp)$ 的对象. 那么
+		$$
+		\mathbb{R}^n\mapsto \big({\mathcal X_1(\mathbb{R}^n)\rightrightarrows \mathcal X_0(\mathbb{R}^n)}\big)
+		$$
+		是一个函子 $\CartSp^{\op}\to\Grpd$.
+	\end{remark}
+	\footnotetext{此处 ``$\Psh(\CartSp)$ 中的群胚'' 的真实含义是意象 $\Psh(\CartSp)$ 对应的 $2$-意象的对象, 也即保持极限的 (2-)函子 $\Psh(\CartSp)^{\op}\to\mathsf{Grpd}$. 由 $\Psh$ 的泛性质这就是函子 $\CartSp^{\op}\to\Grpd$.}
+	
+	\begin{example}
+		设 $\mathcal G = (\mathcal G_1\rightrightarrows \mathcal G_0)$ 是 Lie 群胚, 则对任意流形 $M$, $$\operatorname{Hom}_{\Mfd}(M,\mathcal G_1)\rightrightarrows\operatorname{Hom}_{\Mfd}(M,\mathcal G_0)$$ 是群胚. 特别地, $\mathcal G$ 给出了一个预叠
+		$$
+		\underline{\mathcal G}\colon \mathbb{R}^n\mapsto \big({\operatorname{Hom}_{\Mfd}(\mathbb{R}^n,\mathcal G_1)\rightrightarrows\operatorname{Hom}_{\Mfd}(\mathbb{R}^n,\mathcal G_0)}\big).
+		$$
+		当然, $\mathcal G$ 也可视为 $\Psh(\CartSp)$ 中的群胚, 它与预叠 $\underline{\mathcal G}$ 的关系如前面的注.
+	\end{example}
+	
+	\begin{example}
+		对于 Lie 群 $G$, $\mathbf BG$ 作为预叠可表示为
+		$$
+		\mathbf BG\colon\CartSp^{\op}\to\Grpd,\quad\mathbb R^n \mapsto \{\text{$\mathbb R^n$ 上的 $G$-主丛}\}.
+		$$
+	\end{example}
+	
+	\begin{definition}
+		%(参考 \cite{xjkj-stack})
+		% 叠
+		$\CartSp$ 上的\emph{叠} (stack) 是满足 ``层条件'' 的预叠 $X\colon \CartSp^{\op}\to\Grpd$.
+		所谓 ``层条件'' 是对 $\mathbb R^n$ 的任意好覆盖 $\{U_i\}$, 如下态射为等价,
+		$$
+		X(\mathbb R^n) \to \lim\Big({
+			% https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXHByb2RfaVgoVV9pKSJdLFsxLDAsIlxccHJvZF97aSxqfVgoVV9pXFxjYXAgVV9qKSJdLFsyLDAsIlxccHJvZF97aSxqLGt9WChVX2lcXGNhcCBVX2pcXGNhcCBVX2spIl0sWzAsMSwiIiwwLHsib2Zmc2V0IjoxfV0sWzAsMSwiIiwyLHsib2Zmc2V0IjotMX1dLFsxLDJdLFsxLDIsIiIsMix7Im9mZnNldCI6Mn1dLFsxLDIsIiIsMix7Im9mZnNldCI6LTJ9XV0=
+			\begin{tikzcd}[ampersand replacement=\&,sep=tiny]
+				{\prod_iX(U_i)} \& {\prod_{i,j}X(U_i\cap U_j)} \& {\prod_{i,j,k}X(U_i\cap U_j\cap U_k)}
+				\arrow[shift right, from=1-1, to=1-2]
+				\arrow[shift left, from=1-1, to=1-2]
+				\arrow[from=1-2, to=1-3]
+				\arrow[shift right=2, from=1-2, to=1-3]
+				\arrow[shift left=2, from=1-2, to=1-3]
+			\end{tikzcd}
+		}\Big)
+		$$
+		其中的极限应理解为 $2$-范畴 $\Grpd$ 中的 $2$-极限.
+	\end{definition}
+	
+	叠的定义中 ``层条件'' 可展开表述如下.
+	\begin{itemize}
+		\item (对象的粘合) ...
+		\item (态射的粘合) ...
+	\end{itemize}
+	
+	\begin{remark}
+		很明显, 叠的定义可以推广到更高阶群胚取值的层.
+	\end{remark}
+	
+	% differentiable stack
+	
+	
+	
+	\begin{prop}
+		两个 Lie 群胚 Morita 等价当且仅当它们对应的 $\CartSp$ 上的叠等价.
+	\end{prop}
+	
+	\begin{remark}
+		两个环 Morita 等价的定义是它们的模范畴等价. 这是 Lie 群胚 Morita 等价的名称的来源.
+	\end{remark}
+	
+	% 2-topos
+	
+	\section{综合微分几何}
+	
+	$\CartSp$ 上的层能表现很多的空间, 但难以表现微分几何中很重要的一类空间------切丛.
+	要表现切丛, 一种聪明的思路是考虑一个 ``无穷小线段'' $D$, 于是空间 $X$ 的切丛 $TX$ 就是 $D$ 到 $X$ 的映射空间 $X^D$.
+	
+	为了让上述的直观严格化, 我们需要扩充 $\CartSp$ 这个范畴.
+	
+	\subsection{Weil 代数与无穷小空间}
+	
+	代数--几何对偶告诉我们, 一个空间和它上面的函数环相互对偶. 我们可以用一个环来代表一个空间. 考虑一些新奇的环, 我们便得到一些新奇的空间概念, 这是代数几何的惯用技俩.
+	
+	想象实数轴 $\mathbb{R}$ 的原点处放着一条无穷小的线段 $D$. 我们\emph{规定}, 对 $\mathbb{R}$ 上的任何一个光滑函数 $f$, 只要 $f$ 在原点处的值以及原点处的导数为零, 那么 $f$ 在 $D$ 上恒等于零. 当然, 这对于传统的空间概念是荒谬的 (除非 $D$ 是一个点). 但在代数上这件事完全合法: 我们只不过是在考虑商环
+	$$
+	C^\infty (D) := C^\infty (\mathbb{R}) / I,
+	\quad
+	I = \{f\mid f(0)=f'(0)=0\}.
+	$$
+	不难看出, 这个环也同构于 $\mathbb{R}[x]/(x^2)$, 即 $\{f(x)=ax+b\mid a,b\in\mathbb{R}\}$. 这是因为每个光滑函数 $f$ 在商环中都等价于某个一次函数 $f'(0)x+f(0)$.
+	
+	$D$ 到 $M$ 的一个映射是什么? 由代数--几何对偶的思想, 我们希望这等同于 $C^\infty (M)$ 到 $C^\infty (D)$ 的一个 $\mathbb{R}$-代数同态. 考虑下图,
+	% https://q.uiver.app/#q=WzAsNixbMCwwLCIqIl0sWzEsMCwiRCJdLFsyLDAsIk0iXSxbMCwxLCJDXlxcaW5mdHkgKCopXFxzaW1lcSBSIl0sWzEsMSwiQ15cXGluZnR5IChEKVxcc2ltZXEgXFxtYXRoYmJ7Un1beF0vKHheMikiXSxbMiwxLCJDXlxcaW5mdHkgKE0pIl0sWzAsMV0sWzEsMl0sWzUsNF0sWzQsM11d
+	\[\begin{tikzcd}[ampersand replacement=\&]
+		{*} \& D \& M \\
+		{C^\infty (*)\simeq \mathbb R} \& {C^\infty (D)\simeq \mathbb{R}[x]/(x^2)} \& {C^\infty (M)}
+		\arrow[from=1-1, to=1-2]
+		\arrow[from=1-2, to=1-3]
+		\arrow[from=2-2, to=2-1]
+		\arrow[from=2-3, to=2-2]
+	\end{tikzcd}\]
+	
+	我们需要如下的命题.
+	\begin{prop}
+		代数同态 $C^\infty (M)\to\mathbb{R}$ 一定是取值于一个点.
+	\end{prop}
+	... 但很遗憾, 这个命题可能是错的, 或者至少难以证明. 综合微分几何学家的做法是把 $\mathbb{R}$-代数结构扩充为所谓 ``光滑代数''.
+	因为直观上, 普通的 $\mathbb{R}$-代数结构并不能体现光滑函数的特性: 对于一个光滑函数 $f$, 我们希望能够取 $\exp(f)$, $\sin(f)$, 以及任何 ``光滑函数'' 的操作, 而不仅是加法和乘法等 ``多项式'' 的操作.
+	
+	\begin{definition}
+		一个\emph{光滑代数} $A$ 是一个集合, 带有如下运算: 对每个光滑函数 $\varphi\colon\mathbb{R}^n\to\mathbb{R}^m$, 都有一个运算 $A(\varphi)\colon A^n\to A^m$, 且满足相容条件. 光滑代数之间的同态是保持所有运算的映射.
+	\end{definition}
+	
+	不难发现光滑代数的定义可写成更抽象的形式.
+	
+	\addtocounter{definition}{-1}
+	\begin{definition}[等价表述]
+		\emph{光滑代数}是保持有限积的函子 $\CartSp\to\Set$. 光滑代数之间的同态是函子之间的自然变换.
+	\end{definition}
+	
+	一个光滑代数首先是一个 $\mathbb{R}$-代数. 例如, 光滑代数 $A$ 上的乘法由 $m\colon \mathbb{R}^2\to\mathbb{R},(x,y)\mapsto xy$ 给出. 不妨把这种新的代数想象为带有所有 ``光滑'' 运算的环 (相比之下普通的环仅支持多项式运算). 例如光滑代数 $A$ 中可以做 $\exp$, $\arctan$ 等等所有光滑函数的操作.
+	
+	\begin{example}
+		对光滑流形 $M$, $C^\infty (M)$ 是光滑代数.
+	\end{example}
+	
+	\begin{example}
+		$C^\infty (D)\simeq \mathbb{R}[x]/(x^2)$ 是光滑代数.
+	\end{example}
+	
+	(未完待续)
+	
+	% cohesive topos
+	
+	%\section*{参考文献}
+	
+	\begin{thebibliography}{9}
+		\bibitem{principal-infinity-bundles}
+		Thomas Nikolaus, Urs Schreiber, Danny Stevenson, \emph{Principal $\infty$-bundles --- General theory}, \url{https://arxiv.org/abs/1207.0248}
+		\bibitem{DCCT}
+		Urs Schreiber, \emph{Differential cohomology in a cohesive $\infty$-topos}, \url{https://ncatlab.org/schreiber/show/differential+cohomology+in+a+cohesive+topos}
+		\bibitem{xjkj-stack} 香蕉空间, \emph{叠}, \url{https://www.bananaspace.org/wiki/%E5%8F%A0}
+		\bibitem{topos}
+		王进一, \emph{盲人摸象},
+		\url{https://github.com/SimplicialCat/topos}
+	\end{thebibliography}
+	
+\end{document}
